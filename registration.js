@@ -7,7 +7,7 @@ Redis.on("error", err => {
 
 const Registration = require("car-registration-api-india");
 
-exports.find = (number = "PB65R8674") => {
+exports.find = (number = "KA51HA1551") => {
     return new Promise((resolve, reject) => {
         Redis.get(number, (err, reply) => {
             if (reply !== null) {
@@ -39,18 +39,18 @@ exports.massageData = ({ data }) => {
         VechileIdentificationNumber = {},
         NumberOfSeats = {},
         Colour,
-        Owner: owner,
+        Owner: name,
         EngineNumber,
         FuelType = {},
         RegistrationDate,
         Location: location
     } = data;
     return {
-        owner,
+        name,
         description: Description,
         registrationYear: RegistrationYear,
         vehicleCompany: CarMake.CurrentTextValue,
-        carModel: CarModel.CurrentTextValue,
+        vehicleModel: CarModel.CurrentTextValue,
         displacement: EngineSize.CurrentTextValue,
         makeDescription: MakeDescription.CurrentTextValue,
         modelDescription: ModelDescription.CurrentTextValue,

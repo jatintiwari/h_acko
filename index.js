@@ -33,9 +33,11 @@ router.post("/registration", (req, res) => {
 router.get("/registration/:number", (req, res, next) => {
     const { number = "PB65R8674" } = req.params;
     const upperCaseNumber = number.toUpperCase();
-    find(upperCaseNumber).then(response => {
-        res.json(response);
-    });
+    find(upperCaseNumber)
+        .then(response => {
+            res.json(response);
+        })
+        .catch(e => res.send(e));
 });
 
 router.all("/", (req, res) => res.json({ status: 404 }));
