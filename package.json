@@ -1,0 +1,20 @@
+{
+    "name": "hacko",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "start": "nodemon index.js"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "body-parser": "^1.18.3",
+        "car-registration-api-india": "^1.0.5",
+        "express": "^4.16.4",
+        "redis": "^2.8.0",
+        "simple-spellchecker": "^0.9.6",
+        "spellchecker": "^3.5.0"
+    }
+}
