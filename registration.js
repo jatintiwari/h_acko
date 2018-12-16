@@ -6,11 +6,14 @@ Redis.on("error", err => {
 });
 
 const Registration = require("car-registration-api-india");
+const CAR = "Car";
+const MOTORCYCLE = "Bike";
 
 exports.find = (number = "KA51HA1551") => {
     return new Promise((resolve, reject) => {
+        if (!number) return resolve({ data: "NA" });
         Redis.get(number, (err, reply) => {
-            if (reply !== "null" || reply !== null) {
+            if (reply !== null) {
                 console.log("Key found! Loading data from cache", number);
                 resolve({
                     data: JSON.parse(reply),
@@ -18,10 +21,11 @@ exports.find = (number = "KA51HA1551") => {
                 });
             } else {
                 console.log("Key not found! Hitting API", number);
-                // Registration.CheckCarRegistrationIndia(number, "jatintiwari", data => {
-                //     Redis.set(number, JSON.stringify(data));
-                //     resolve({ data, cache: false });
-                // });
+                Registration.CheckCarRegistrationIndia(number, "jatintiwari", data => {
+                    Redis.set(number, JSON.stringify(data));
+                    console.log("Found data!", JSON.stringify(data));
+                    resolve({ data, cache: false });
+                });
             }
         });
     });
@@ -29,10 +33,8 @@ exports.find = (number = "KA51HA1551") => {
 
 const recognizeVehicleType = (vehicleModel = "") => {
     const model = vehicleModel.toLowerCase();
-    const CAR = "CAR";
-    const MOTORCYCLE = "MOTORCYCLE";
     const carRegex = /hyundai|maruti|nissan|ford|toyota|tata/;
-    const motorcyleRegex = /yamaha|honda|hero|ktm|kawasaki|suzuki/;
+    const motorcyleRegex = /yamaha|honda|hero|ktm|kawasaki|suzuki|bajaj/;
     try {
         if (model.match(carRegex)) {
             return CAR;
@@ -44,6 +46,15 @@ const recognizeVehicleType = (vehicleModel = "") => {
         return CAR;
     } catch (e) {
         return CAR;
+    }
+};
+
+const getPremium = (vehicleModel = "") => {
+    const model = recognizeVehicleType(vehicleModel);
+    if (model === CAR) {
+        return 10000;
+    } else {
+        return 2000;
     }
 };
 
@@ -77,11 +88,12 @@ exports.massageData = ({ data }) => {
         chassisNumber: VechileIdentificationNumber,
         numberOfSeats: NumberOfSeats.CurrentTextValue,
         colour: Colour,
-        enginerNumber: EngineNumber,
+        engineNumber: EngineNumber,
         fuelType: FuelType.CurrentTextValue,
         registrationDate: RegistrationDate,
         location,
-        vehicleType: recognizeVehicleType(CarModel.CurrentTextValue)
+        vehicleType: recognizeVehicleType(CarMake.CurrentTextValue),
+        premium: getPremium(CarMake.CurrentTextValue)
     };
 };
 
@@ -95,16 +107,17 @@ exports.extractRegistratioNumber = data => {
     );
     const registrationNumber = splittedData.reduce((acc, row) => {
         const upperCaseRowNonSpaced = row.toUpperCase().replace(/[^a-zA-Z0-9]/g, "");
-        if (row.length > 15) return acc;
+        // if (row.length > 15) return acc;
         const match = upperCaseRowNonSpaced.match(regex);
         const match1 = upperCaseRowNonSpaced.match(regex1);
         if (match && match.length) {
             console.log({ match });
             acc = match[0];
-        }else if (match1 && match1.length) {
-            console.log({ match1 });
-            acc = match1[0];
         }
+        //  else if (match1 && match1.length) {
+        //     console.log({ match1 });
+        //     acc = match1[0];
+        // }
         return acc;
     }, null);
     console.log({ registrationNumber });
