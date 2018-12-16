@@ -21,8 +21,7 @@ router.post("/registration", (req, res) => {
     const { data = [] } = req.body;
     console.log(`transforming: `, { data });
     const imageData = extractRegistratioNumber(data);
-    // imageData.registrationNumber
-    find()
+    find(imageData.registrationNumber)
         .then(massageData)
         .then(response => {
             res.json({ ...imageData, ...response });

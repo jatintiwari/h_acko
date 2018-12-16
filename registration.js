@@ -10,7 +10,7 @@ const Registration = require("car-registration-api-india");
 exports.find = (number = "KA51HA1551") => {
     return new Promise((resolve, reject) => {
         Redis.get(number, (err, reply) => {
-            if (reply !== null) {
+            if (reply !== "null" || reply !== null) {
                 console.log("Key found! Loading data from cache", number);
                 resolve({
                     data: JSON.parse(reply),
@@ -31,8 +31,8 @@ const recognizeVehicleType = (vehicleModel = "") => {
     const model = vehicleModel.toLowerCase();
     const CAR = "CAR";
     const MOTORCYCLE = "MOTORCYCLE";
-    const carRegex = /hyundai|maruti|nissan/;
-    const motorcyleRegex = /yamaha|honda|hero|ktm|kawasaki/;
+    const carRegex = /hyundai|maruti|nissan|ford|toyota|tata/;
+    const motorcyleRegex = /yamaha|honda|hero|ktm|kawasaki|suzuki/;
     try {
         if (model.match(carRegex)) {
             return CAR;
@@ -94,14 +94,14 @@ exports.extractRegistratioNumber = data => {
         /(([ML|AS|MN|BR|MP|CG|MZ|CH|NL|DD|OD|DL|PB|DN|PY|GA|RJ|GJ|SK|HR|TN|HP|TR|JH|TS|JK|UK|KA|UP|KL]){2}(|-)(?:[0-9]){1,2}(|-)(?:[A-Za-z]){2}(|-)([0-9]){1,4})|(([A-Za-z]){2,3}(|-)([0-9]){1,4})/
     );
     const registrationNumber = splittedData.reduce((acc, row) => {
-        const upperCaseRow = row.toUpperCase();
+        const upperCaseRowNonSpaced = row.toUpperCase().replace(/[^a-zA-Z0-9]/g, "");
         if (row.length > 15) return acc;
-        const match = upperCaseRow.match(regex);
-        const match1 = upperCaseRow.match(regex1);
+        const match = upperCaseRowNonSpaced.match(regex);
+        const match1 = upperCaseRowNonSpaced.match(regex1);
         if (match && match.length) {
             console.log({ match });
             acc = match[0];
-        } else if (match1 && match1.length) {
+        }else if (match1 && match1.length) {
             console.log({ match1 });
             acc = match1[0];
         }
