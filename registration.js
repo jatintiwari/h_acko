@@ -27,6 +27,26 @@ exports.find = (number = "KA51HA1551") => {
     });
 };
 
+const recognizeVehicleType = (vehicleModel = "") => {
+    const model = vehicleModel.toLowerCase();
+    const CAR = "CAR";
+    const MOTORCYCLE = "MOTORCYCLE";
+    const carRegex = /hyundai|maruti|nissan/;
+    const motorcyleRegex = /yamaha|honda|hero|ktm|kawasaki/;
+    try {
+        if (model.match(carRegex)) {
+            return CAR;
+        }
+
+        if (model.match(motorcyleRegex)) {
+            return MOTORCYCLE;
+        }
+        return CAR;
+    } catch (e) {
+        return CAR;
+    }
+};
+
 exports.massageData = ({ data }) => {
     const {
         Description,
@@ -36,10 +56,10 @@ exports.massageData = ({ data }) => {
         EngineSize = {},
         MakeDescription = {},
         ModelDescription = {},
-        VechileIdentificationNumber = {},
+        VechileIdentificationNumber,
         NumberOfSeats = {},
         Colour,
-        Owner: name,
+        Owner: name = "",
         EngineNumber,
         FuelType = {},
         RegistrationDate,
@@ -54,13 +74,14 @@ exports.massageData = ({ data }) => {
         displacement: EngineSize.CurrentTextValue,
         makeDescription: MakeDescription.CurrentTextValue,
         modelDescription: ModelDescription.CurrentTextValue,
-        chassisNumber: VechileIdentificationNumber.CurrentTextValue,
+        chassisNumber: VechileIdentificationNumber,
         numberOfSeats: NumberOfSeats.CurrentTextValue,
         colour: Colour,
         enginerNumber: EngineNumber,
         fuelType: FuelType.CurrentTextValue,
         registrationDate: RegistrationDate,
-        location
+        location,
+        vehicleType: recognizeVehicleType(CarModel.CurrentTextValue)
     };
 };
 
